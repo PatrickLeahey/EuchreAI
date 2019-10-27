@@ -27,7 +27,6 @@ class Hand:
 				left_bower = ['S','J']
 			elif trump_suit == 'S':
 				left_bower = ['C','J']
-
 			
 			if card.get_desc() == left_bower:
 				print(f'Set left bower to {left_bower}')

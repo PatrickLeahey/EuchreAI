@@ -11,9 +11,10 @@ class Player:
 		self.team = 0 if team in [0,2] else 1
 		self.called_trump = False
 		self.went_alone = False
+		self.order = 'NA'
 
 		#Player Stats
-		#Stats increase for higher intergers
+		#Stats increase for higher integers
 		self.lead_with_trump = random.uniform(0,1)
 		self.lead_with_ace = random.uniform(0,1)
 		self.call_trump_round_one = random.uniform(0,1)
@@ -26,6 +27,9 @@ class Player:
 
 	def get_player_score(self):
 		return self.score
+
+	def add_to_player_score(self,amount):
+		self.score = self.score + amount
 
 	def reset_player_score(self):
 		self.score = 0
@@ -75,6 +79,12 @@ class Player:
 		else:
 			self.called_trump = True
 
+	def get_order(self):
+		return self.order
+
+	def set_order(self, order):
+		self.order = order
+
 	def get_went_alone(self):
 		return self.went_alone
 
@@ -115,3 +125,18 @@ class Player:
 				self.toggle_called_trump()
 
 		return chosen
+
+	def play_card(self,played_so_far):
+		#If no cards have been played yet, the player must lead
+
+		pass
+		#Have to follow suit
+		#Check first element in list
+		#Get cards in hand that have the same suit as first card in list - make sure to check for 
+
+
+
+
+
+
+

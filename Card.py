@@ -40,6 +40,7 @@ class Card:
 
 	def set_left(self):
 		self.worth = 12
+		self.is_trump = True
 
 	def is_trump(self):
 		return self.is_trump
