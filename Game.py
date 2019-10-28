@@ -45,7 +45,6 @@ class Game:
         print([card.get_desc() for card in self.deck.get_cards()])
         print('\n')
 
-
     #Following each round, the dealer rotates up
     def next_dealer(self):
         #There will not be a set dealer in the first round
@@ -250,6 +249,3 @@ class Game:
         # print(f'--------------TEAM {winner_number} WINS --------------')
         # print('----------------------------------------')
         # print('\n')
-
-
-

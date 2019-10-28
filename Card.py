@@ -5,6 +5,7 @@ class Card:
 		self.value = value
 		self.is_trump = False
 		self.worth = int(worth)
+		self.is_left = False
 	
 	def get_suit(self):
 		return self.suit
@@ -41,9 +42,13 @@ class Card:
 	def set_left(self):
 		self.worth = 12
 		self.is_trump = True
+		self.is_left = True
 
 	def get_is_trump(self):
 		return self.is_trump
+
+	def get_is_left(self):
+		return self.is_left
 
 	def get_worth(self):
 		return self.worth
