@@ -55,6 +55,24 @@ class Player:
 	def get_go_alone(self):
 		return self.go_alone 
 
+	def set_lead_with_trump(self,l):
+		self.lead_with_trump = l
+
+	def set_lead_with_ace(self,a):
+		self.lead_with_ace = a
+
+	def set_call_trump_round_one(self,o):
+		self.call_trump_round_one = o 
+
+	def set_call_trump_round_two(self, t):
+		self.call_trump_round_two = t
+
+	def set_count_on_partner(self, p):
+		self.count_on_partner = p
+
+	def set_go_alone(self, g):
+		self.go_alone = g
+
 	def is_dealer(self):
 		return self.dealer
 
@@ -93,6 +111,9 @@ class Player:
 			self.went_alone = False
 		else:
 			self.went_alone = True
+
+	def set_team(self,team):
+		self.team = team
 
 	#This function handles betting for trump at beginning of each round
 	def bet(self,flipped_card,round):
