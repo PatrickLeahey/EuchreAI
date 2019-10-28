@@ -108,7 +108,6 @@ class Player:
 
 		#For round one, the player has to choose whether or not to call the flipped card trump or not
 		if round == 0:
-			print(f'Player {self.player_id} selecting suit from {card_suit}')
 			chosen = ''
 			
 			if chosen != '':
@@ -118,7 +117,6 @@ class Player:
 		else:
 			all_suits = ['H','D','C','S']
 			all_suits.remove(card_suit)
-			print(f'Player {self.player_id} selecting suit from {all_suits}')
 			chosen = 'H'
 			
 			if chosen != '':
@@ -129,10 +127,13 @@ class Player:
 	def play_card(self,played_so_far):
 		#If no cards have been played yet, the player must lead
 
-		pass
 		#Have to follow suit
 		#Check first element in list
 		#Get cards in hand that have the same suit as first card in list - make sure to check for 
+
+		card_to_play = random.choice(self.hand.get_cards())
+		self.hand.remove_card(card_to_play)
+		return card_to_play
 
 
 

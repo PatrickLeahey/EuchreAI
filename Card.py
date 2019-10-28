@@ -42,8 +42,11 @@ class Card:
 		self.worth = 12
 		self.is_trump = True
 
-	def is_trump(self):
+	def get_is_trump(self):
 		return self.is_trump
 
 	def get_worth(self):
 		return self.worth
+
+	def set_worth(self,worth):
+		self.worth = worth

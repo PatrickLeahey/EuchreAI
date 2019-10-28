@@ -16,8 +16,6 @@ class Hand:
 		for card in self.get_cards():
 			if card.get_desc()[0] == trump_suit:
 				card.set_trump()
-				print(f'Set card {card.get_desc()} to trump')
-				print(f'This card now has worth {card.get_worth()}')
 
 			if trump_suit == 'H':
 				left_bower = ['D','J']
@@ -29,7 +27,6 @@ class Hand:
 				left_bower = ['C','J']
 			
 			if card.get_desc() == left_bower:
-				print(f'Set left bower to {left_bower}')
 				card.set_left()
 
 

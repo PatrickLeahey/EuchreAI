@@ -33,7 +33,7 @@ class Game:
 
     #Get human readable details about the tables state
     def get_table_readable(self):
-        print(f'Game {self.game_id} Player Hands:')
+        print(f'Game {self.game_id} Player hands:')
         for player_hand in self.get_table_raw():
             print(player_hand)
         print('\n')
@@ -80,9 +80,38 @@ class Game:
         played_so_far = []
 
         for player in self.table.get_players():
-            player.play_card(played_so_far)
+            played_so_far.append(player.play_card(played_so_far))
 
-        return [0,1]
+        #Generate score of format score = [0,1] or [1,0] as only one team can win
+        #We will optimize for team win rather than individual win because the goal of the game is for the team to win
+        score = []
+
+        #The winning card is the highest worth card contingent upon the fact that the card follows suit or is trump
+        leading_suit = played_so_far[0].get_suit()
+        for played_card in played_so_far:
+            if played_card.get_suit() != leading_suit:
+                if not played_card.get_is_trump():
+                    played_card.set_worth(0)
+
+        card_values = [card.get_worth() for card in played_so_far]
+        winning_value = sorted(card_values, reverse = True)[0]
+        winning_card = played_so_far[card_values.index(winning_value)]
+        winning_team = 'NA'
+        if played_so_far.index(winning_card) in [0,2]:
+            winning_team = self.table.get_players()[0].get_team()
+        else:
+            winning_team = self.table.get_players()[1].get_team()
+
+        if winning_team == 0:
+            score = [1,0]
+        else:
+            score = [0,1]
+
+        #Add points to player score 
+        for player in self.table.get_players():
+            player.add_to_player_score(score[player.get_team()])
+
+        return score
 
     #A round involves 20 cards and is equal to 5 tricks
     #Teams can receive 1, 2, or 4 points for each team
@@ -97,7 +126,6 @@ class Game:
         trump_suit = ''
 
         #First roound betting
-        print('Players are betting:')
         picked_up = False
         for player in self.table.get_players():
             bet = player.bet(flipped_card,0)
@@ -120,9 +148,6 @@ class Game:
                     picked_up = True
                     trump_suit = bet
                     break
-
-        print(f'Player chose {trump_suit} as trump_suit')
-        print('\n')
 
         if trump_suit != '':
 
@@ -189,19 +214,16 @@ class Game:
         print('\n')
 
         score = [0,0]
-        num_round = 0
+        num_round = 1
         while score[0] < 10 and score[1] < 10:
-            num_round = num_round + 1
             round_score = self.play_round()
-
-            self.get_table_readable()
 
             score = [score[0] + round_score[0], score[1] + round_score[1]]
 
             print('----------------------------------------')
             print(f'-------------Round Number: {num_round} -----------')
-            print(f'-------------------Team 0: {score[0]} -----------')
-            print(f'-------------------Team 1: {score[1]} -----------')
+            print(f'----------------Team 0: {score[0]} --------------')
+            print(f'----------------Team 1: {score[1]} --------------')
             print('----------------------------------------')
             print('\n')
 
@@ -214,6 +236,8 @@ class Game:
 
                     if player.get_went_alone():
                         player.toggle_went_alone()
+
+            num_round = num_round + 1
 
         winner_number = 0 if score[0] > score[1] else 1
         print('----------------------------------------')

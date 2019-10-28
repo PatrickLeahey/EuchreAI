@@ -6,6 +6,7 @@ class Table:
         self.len = 4
         self.players = players
 
+    #Return players
     def get_players(self):
         return self.players
 
@@ -13,9 +14,7 @@ class Table:
     def rotate_once(self):
         last = self.players.pop(-1)
         self.players.insert(0, last)
-        print('Rotated Players')
-        print(f'New order: {self.players}')
-
+        
     #This will rotate the table the correct number of times so that the player passed is the first in the list
     def set_first(self,player):
         num_rotations = self.players.index(player)
