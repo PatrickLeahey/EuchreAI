@@ -19,7 +19,7 @@ git clone git@github.com:PatrickLeahey/EuchreAI.git
 
 ## Train Players
 
-Change configuration parameters in train_config.py. Then run below:
+Change configuration parameters in config/train_config.py. Then run below:
 
 ```
 python Train.py
@@ -27,7 +27,7 @@ python Train.py
 
 ### Play Euchre 
 
-Change configuration parameters in play_config.py. Then run below:
+Change configuration parameters in config/play_config.py. Then run below:
 
 ```
 python test_game.py
