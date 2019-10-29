@@ -30,6 +30,6 @@ python Train.py
 Change configuration parameters in play_config.py. Then run below:
 
 ```
-test_game.py
+python test_game.py
 ```
 
