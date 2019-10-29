@@ -24,19 +24,19 @@ class Card:
 		if self.worth == 1:
 			self.worth = 7
 		#Ten
-		if self.worth == 2:
+		elif self.worth == 2:
 			self.worth = 8
 		#Jack
-		if self.worth == 3:
+		elif self.worth == 3:
 			self.worth = 13
 		#Queen
-		if self.worth == 4:
+		elif self.worth == 4:
 			self.worth = 9
 		#King
-		if self.worth == 5:
+		elif self.worth == 5:
 			self.worth = 10
 		#Ace
-		if self.worth == 6:
+		elif self.worth == 6:
 			self.worth = 11
 
 	def set_left(self):

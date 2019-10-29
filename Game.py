@@ -8,6 +8,8 @@ class Game:
         self.game_id = random.randint(1000000,9000000)
         self.deck = Deck()
         self.table = Table()
+        self.user = False
+        self.user_player = 'NA'
 
     def get_players(self):
         return self.table.get_players()
@@ -29,6 +31,32 @@ class Game:
         for player in self.table.get_players():
             for _ in range(5):
                 player.get_hand().add_card(self.deck.draw_card())
+
+        if self.user:
+            print(f'You were dealt: {[card.get_desc() for card in self.user_player.get_hand().get_cards()]}')
+
+    def create_user(self):
+        self.user = True
+        self.user_player = self.table.get_players()[0]
+        self.user_player.set_is_user()
+
+        print('\n')
+
+        print('                            |----|  |    |  |----|  |    |  |----   |----|')
+        print('                            |       |    |  |       |    |  |    |  |     ')
+        print('                            |--|    |    |  |       |----|  |----   |--|  ')
+        print('                            |       |    |  |       |    |  |  |    |     ')
+        print('                            |----|  |----|  |----|  |    |  |   |   |----|')
+
+        print('\n')
+
+        print('                                          By: Patrick Leahey')
+
+        print('\n')
+
+        print(f'Welcome to game {self.game_id}')
+        print(f'You are on team: {self.user_player.get_team()}')
+        print('\n')
 
     #Get raw details about the current table state
     def get_table_raw(self):
@@ -68,8 +96,21 @@ class Game:
                 self.table.get_players()[0].toggle_dealer()
                 self.table.set_first(self.table.get_players()[1])
         else:
-            self.table.get_players()[0].toggle_dealer()
-            self.table.set_first(self.table.get_players()[1])
+
+            #Random first dealer
+            deal = random.randint(0,3)
+            first = 0 if deal == 3 else deal + 1
+
+            self.table.get_players()[deal].toggle_dealer()
+            self.table.set_first(self.table.get_players()[first])
+
+        if self.user:
+            #If user is dealer
+            if self.table.get_players()[[player.is_dealer() for player in self.table.get_players()].index(True)].get_is_user():
+                print('You are now dealer!')
+            else:
+                dealer_id = self.table.get_players()[[player.is_dealer() for player in self.table.get_players()].index(True)].get_player_id()
+                print(f'Player {dealer_id} is now dealer!')
 
         return dealer_index
         
@@ -84,7 +125,22 @@ class Game:
         played_so_far = []
 
         for player in self.table.get_players():
-            played_so_far.append(player.play_card(played_so_far))
+
+            #If the player's teammate went alone, skip their turn
+            if True not in [p.get_went_alone() for p in self.table.get_players() if player.get_team() == p.get_team()]:
+                played_so_far.append(player.play_card(played_so_far))
+
+                if self.user:
+                    if player.get_is_user():
+                        if not played_so_far:
+                            Print('It is your turn to lead')
+
+                    else:
+                        print(f'Player {player.get_player_id()} played {played_so_far[-1].get_desc()}')
+
+
+
+
 
         #Generate score of format score = [0,1] or [1,0] as only one team can win
         #We will optimize for team win rather than individual win because the goal of the game is for the team to win
@@ -105,6 +161,9 @@ class Game:
             winning_team = self.table.get_players()[0].get_team()
         else:
             winning_team = self.table.get_players()[1].get_team()
+
+        if self.user:
+            print(f'Team {winning_team} won the trick!')
 
         if winning_team == 0:
             score = [1,0]
@@ -127,36 +186,70 @@ class Game:
         #Remainder of cards in self.deck (4) are the kitty -- select the card on top
         flipped_card = self.deck.get_cards()[3]
 
+        if self.user:
+            print(f'Dealer flipped {flipped_card.get_desc()}')
+
         trump_suit = ''
+        dealer_team = ''
 
         #First roound betting
         picked_up = False
+        picked_up_round = ''
+
         for player in self.table.get_players():
-            bet = player.bet(flipped_card,0)
+            #Which team is dealing - we want to be able to tell this information to the players when they're betting
+            dealer_team = [player.get_team() for player in self.table.get_players() if player.is_dealer()][0]
+
+            bet = player.bet(flipped_card,dealer_team,0)
             if bet != '':
-                #Dealer drops one of their cards
-                #Dealer picks up flipped card
-                dealer_index = [player.is_dealer() for player in self.table.get_players()].index(True)
-                remove_card = random.choice(self.table.get_players()[dealer_index].get_hand().get_cards())
-                self.table.get_players()[dealer_index].get_hand().remove_card(remove_card)
-                self.table.get_players()[dealer_index].get_hand().add_card(flipped_card)
                 picked_up = True
+                picked_up_round = 0
                 trump_suit = flipped_card.get_desc()[0]
+
+                if self.user:
+                    print(f'Player {player.get_player_id()} chose {trump_suit} as trump suit for {player.get_team()}')
+                    print(f'Dealer (Player {self.table.get_players()[dealer_index].get_player_id()}) picked up {flipped_card.get_desc()} and discarded')
+
                 break
+
+            else:
+                if self.user:
+                    print(f'Player {player.get_player_id()} passed')
 
         #Second round betting
         if picked_up == False:
             for player in self.table.get_players():
-                bet = player.bet(flipped_card,1)
+                bet = player.bet(flipped_card,dealer_team,1)
                 if bet != '':
                     picked_up = True
                     trump_suit = bet
+
+                    if self.user:
+                        print(f'Player {player.get_player_id()} chose {trump_suit} as trump suit for {player.get_team()}')
+
                     break
+                else:
+                    if self.user:
+                        print(f'Player {player.get_player_id()} passed')
 
         if trump_suit != '':
 
             for player in self.table.get_players():
                 player.get_hand().set_trump(trump_suit)
+
+            if picked_up_round == 0:
+                #Dealer drops one of their cards
+                #Dealer picks up flipped card
+                dealer_index = [player.is_dealer() for player in self.table.get_players()].index(True)
+                #Dealer decide which card to drop -- their worst card unless the flipped card is worse than all
+                dealer_cards = self.table.get_players()[dealer_index].get_hand().get_cards()
+                dealer_card_vals = [card.get_worth() for card in dealer_cards]
+                dealer_worst_card = sorted(dealer_card_vals)[0]
+                remove_card = dealer_cards[dealer_card_vals.index(dealer_worst_card)]
+                if flipped_card.get_worth() + 6 < remove_card.get_worth():
+                    remove_card = flipped_card
+                self.table.get_players()[dealer_index].get_hand().add_card(flipped_card)
+                self.table.get_players()[dealer_index].get_hand().remove_card(remove_card)
 
             score = [0,0]
             for _ in range(5):
@@ -177,45 +270,52 @@ class Game:
                         went_alone = player.get_team()
 
             if score[0] > score[1]:
-                #print('Team 0 won this round')
+                if self.user:
+                    print('Team 0 won this round')
                 if score[0] == 5:
-                    #print('Team 0 won all 5')
+                    if self.user:
+                        print('Team 0 won all 5')
                     return [2,0]
                 elif team_called_trump == 1:
-                    #print('Team 0 euchred Team 1')
+                    if self.user:
+                        print('Team 0 euchred Team 1')
                     return [2,0]
                 elif went_alone == 0 and score[0] == 5:
-                    #print('Team 0 went alone and won all 5')
+                    if self.user:
+                        print('Team 0 went alone and won all 5')
                     return [4,0]
                 else: 
                     return [1,0]
 
             else:
-                #print('Team 1 won this round')
+                if self.user:
+                    print('Team 1 won this round')
                 if score[1] == 5:
-                    #print('Team 1 won all 5')
+                    if self.user:
+                        print('Team 1 won all 5')
                     return [0,2]
                 elif team_called_trump == 0:
-                    #print('Team 1 euchred Team 0')
+                    if self.user:
+                        print('Team 1 euchred Team 0')
                     return [0,2]
                 elif went_alone == 1 and score[1] == 5:
-                    #print('Team 1 went alone and won all 5')
+                    if self.user:
+                        print('Team 1 went alone and won all 5')
                     return [0,4]
                 else: 
                     return [0,1]
-                #print('\n')
+                if self.user:
+                    print('\n')
 
         #The suit was not set during betting
         else:
-            #print('Neither team wanted to bet')
-            #print('\n')
+            if self.user:
+                print('Neither team wanted to bet')
+                print('\n')
             return [0,0]
 
     #A game is over when one team reaches 10 points
     def play_game(self):
-
-        #print(f'Game started with id: {self.game_id}')
-        #print('\n')
 
         score = [0,0]
         num_round = 1
@@ -224,16 +324,20 @@ class Game:
 
             score = [score[0] + round_score[0], score[1] + round_score[1]]
 
-            # print('----------------------------------------')
-            # print(f'-------------Round Number: {num_round} -----------')
-            # print(f'----------------Team 0: {score[0]} --------------')
-            # print(f'----------------Team 1: {score[1]} --------------')
-            # print('----------------------------------------')
-            # print('\n')
+            if self.user:
+                print('----------------------------------------')
+                print(f'-------------Round Number: {num_round} -----------')
+                print(f'----------------Team 0: {score[0]} --------------')
+                print(f'----------------Team 1: {score[1]} --------------')
+                print('----------------------------------------')
+                print('\n')
 
             self.deck = Deck()
             for player in self.table.get_players():
                 player.reset_hand()
+
+                if player.is_dealer():
+                    player.toggle_dealer()
 
                 if player.get_called_trump():
                     player.toggle_called_trump()
@@ -243,9 +347,11 @@ class Game:
 
             num_round = num_round + 1
 
-        winner_number = 0 if score[0] > score[1] else 1
-        # print('----------------------------------------')
-        # print('-------------GAME-----OVER--------------')
-        # print(f'--------------TEAM {winner_number} WINS --------------')
-        # print('----------------------------------------')
-        # print('\n')
+        if self.user:
+
+            winner_number = 0 if score[0] > score[1] else 1
+            print('----------------------------------------')
+            print('-------------GAME-----OVER--------------')
+            print(f'--------------TEAM {winner_number} WINS --------------')
+            print('----------------------------------------')
+            print('\n')
