@@ -1,7 +1,7 @@
 # EuchreAI
 Genetic Algorithm Approach to Automated Euchre Bot
 
-![alt text](https://raw.githubusercontent.com/username/projectname/branch/path/to/img.png)
+![alt text](https://raw.githubusercontent.com/PatrickLeahey/EuchreAI/master/Euchre.jpg)
 
 ## Getting Started
 
