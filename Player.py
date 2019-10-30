@@ -14,6 +14,7 @@ class Player:
 		self.went_alone = False
 		self.order = 'NA'
 		self.is_user = False
+		self.name = ''
 
 		#Player Stats
 		#Stats increase for higher integers
@@ -45,6 +46,12 @@ class Player:
 
 	def get_hand(self):
 		return self.hand
+
+	def set_name(self,name):
+		self.name = name
+
+	def get_name(self):
+		return self.name
 
 	def get_lead_with_trump(self):
 		return self.lead_with_trump 

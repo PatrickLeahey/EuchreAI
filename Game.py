@@ -1,6 +1,8 @@
 import random
 from Deck import Deck
 from Table import Table
+from PyQt5.QtWidgets import QLabel
+from PyQt5.QtGui import QPixmap
 
 class Game:
     #Instantiate Game Instance
@@ -10,6 +12,7 @@ class Game:
         self.table = Table()
         self.user = False
         self.user_player = 'NA'
+        self.window = 'NA'
 
     def get_players(self):
         return self.table.get_players()
@@ -33,7 +36,17 @@ class Game:
                 player.get_hand().add_card(self.deck.draw_card())
 
         if self.user:
-            print(f'You were dealt: {[card.get_desc() for card in self.user_player.get_hand().get_cards()]}')
+            #Cards you were dealt
+            for card in self.user_player.get_hand().get_cards():
+                label = QLabel(self.window)
+                pixmap = QPixmap(card.get_img_path())
+                label.setPixmap(pixmap)
+
+    def set_window(self,window):
+        self.window = window
+
+    def get_window(self):
+        return self.window
 
     def create_user(self):
         self.user = True
@@ -83,6 +96,9 @@ class Game:
 
         if True in [player.is_dealer() for player in self.table.get_players()]:
             dealer_index = [player.is_dealer() for player in self.table.get_players()].index(True)
+
+            print(f'Dealer index before switching: {dealer_index}')
+
             self.table.get_players()[dealer_index].toggle_dealer()
             if dealer_index != 3:
                 lead_index = dealer_index + 1
@@ -127,6 +143,7 @@ class Game:
         for player in self.table.get_players():
 
             #If the player's teammate went alone, skip their turn
+            #Otherwise, do the following
             if True not in [p.get_went_alone() for p in self.table.get_players() if player.get_team() == p.get_team()]:
                 played_so_far.append(player.play_card(played_so_far))
 
@@ -134,6 +151,7 @@ class Game:
                     if player.get_is_user():
                         if not played_so_far:
                             Print('It is your turn to lead')
+                        print(f'You played {played_so_far[-1].get_desc()}')
 
                     else:
                         print(f'Player {player.get_player_id()} played {played_so_far[-1].get_desc()}')
@@ -269,44 +287,66 @@ class Game:
                     if player.get_went_alone():
                         went_alone = player.get_team()
 
+            print('---------')
+
             if score[0] > score[1]:
                 if self.user:
                     print('Team 0 won this round')
+                    print('---------')
+                    print('\n')
                 if score[0] == 5:
                     if self.user:
                         print('Team 0 won all 5')
+                        print('---------')
+                        print('\n')
                     return [2,0]
                 elif team_called_trump == 1:
                     if self.user:
                         print('Team 0 euchred Team 1')
+                        print('---------')
+                        print('\n')
                     return [2,0]
                 elif went_alone == 0 and score[0] == 5:
                     if self.user:
                         print('Team 0 went alone and won all 5')
+                        print('---------')
+                        print('\n')
                     return [4,0]
                 else: 
+                    if self.user:
+                        print('---------')
+                        print('\n')
                     return [1,0]
 
             else:
                 if self.user:
                     print('Team 1 won this round')
+                    print('---------')
+                    print('\n')
                 if score[1] == 5:
                     if self.user:
                         print('Team 1 won all 5')
+                        print('---------')
+                        print('\n')
                     return [0,2]
                 elif team_called_trump == 0:
                     if self.user:
                         print('Team 1 euchred Team 0')
+                        print('---------')
+                        print('\n')
                     return [0,2]
                 elif went_alone == 1 and score[1] == 5:
                     if self.user:
                         print('Team 1 went alone and won all 5')
+                        print('---------')
+                        print('\n')
                     return [0,4]
                 else: 
+                    if self.user:
+                        print('---------')
+                        print('\n')
                     return [0,1]
-                if self.user:
-                    print('\n')
-
+            
         #The suit was not set during betting
         else:
             if self.user:

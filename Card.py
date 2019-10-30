@@ -1,11 +1,12 @@
 class Card:
 
-	def __init__(self,suit,value,worth):
+	def __init__(self,suit,value,worth,img_path):
 		self.suit = suit
 		self.value = value
 		self.is_trump = False
 		self.worth = int(worth)
 		self.is_left = False
+		self.img_path = img_path
 	
 	def get_suit(self):
 		return self.suit
@@ -15,6 +16,9 @@ class Card:
 
 	def get_desc(self):
 		return [self.suit,self.value]
+
+	def get_img_path(self):
+		return self.img_path
 
 	#6 was chosen because a 9 of trump can beat any non-trump ace
 	def set_trump(self): 
