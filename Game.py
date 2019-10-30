@@ -42,6 +42,7 @@ class Game:
                 pixmap = QPixmap(card.get_img_path())
                 label.setPixmap(pixmap)
 
+
     def set_window(self,window):
         self.window = window
 

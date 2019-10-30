@@ -4,6 +4,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtMultimedia import QSound
 from Game import Game
+from Window import Window
 import config.play_config as con
 import random
 
@@ -40,29 +41,13 @@ def create_app():
 	...
 	app.setPalette(palette)
 
-	window = QWidget()
+	window = Window(QWidget())
+	return app
 
-	window.setWindowTitle('EuchreAI: Can you beat the bots?')
-	window.setWindowIcon(QIcon('config/card_imgs/readme_img.jpg'))
-	window.resize(640,480)
-
-	layout = QVBoxLayout()
-
-	#Create signal
-	button = QPushButton('Start game')
-
-	layout.addWidget(button)
-
-	#Connect buttons to window
-	window.setLayout(layout)
-
-	#Connect slot to signal
-	button.clicked.connect(lambda: play(window))
-
-	window.show()
+#If run from the command line
+if __name__ == "__main__":
+	app = create_app()
 	app.exec_()
-
-create_app()
 
 
 
