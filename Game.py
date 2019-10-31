@@ -4,6 +4,7 @@ from Table import Table
 from Display import Display
 import config.play_config as con
 import pygame
+import math
 
 class Game:
 	#Instantiate Game Instance
@@ -40,27 +41,29 @@ class Game:
 
 				else:
 					self.display.pump()
-					background = pygame.Surface((500,200))
+
+					background = pygame.Surface((self.display.get_width()//2, self.display.get_height()//8))
 					background.fill((0,128,0))
 					background_rect = background.get_rect()
-					background_rect.center = (320,370)
+					background_rect.center = (self.display.get_width()//2,self.display.get_height()//8*7)
 					self.display.blit(background,background_rect)
 					self.display.update(background_rect)
+
 					self.display.pump()
+
 					rects = []
 					self.display.pump()
 
 					for i,card in zip(range(len(self.user_player.get_hand().get_cards())),self.user_player.get_hand().get_cards()):
 						self.display.pump()
 						img_path = card.get_img_path()
-						self.display.pump()
 						image = pygame.image.load(img_path).convert_alpha()
-
-						self.display.pump()
-						image = pygame.transform.smoothscale(image, (60,120))
+						image = pygame.transform.smoothscale(image, (self.display.get_width()//10,self.display.get_height()//6))
 						image_rect = image.get_rect()
-						self.display.pump()
-						image_rect.center = (155.5 + i * 85, 370)
+						space = self.display.get_width()//50
+						start_left = self.display.get_width()//2 - (2 * space) - (2 * self.display.get_width()//8)
+						image_rect.center = ((start_left + i * (space + self.display.get_width()//8)), (self.display.get_height()//8 * 7))
+
 						self.display.pump()
 						
 						rects.append(image_rect)
@@ -68,7 +71,6 @@ class Game:
 
 						#Add rect to card object
 						card.set_rect(image_rect)
-
 						self.display.update(image_rect)
 
 					self.display.pump()
@@ -612,42 +614,44 @@ class Game:
 					names.append(name)
 					named = True
 
-		background = pygame.Surface((640,480))
+		background = pygame.Surface((self.display.get_width(),self.display.get_height()))
 		background.fill((0,128,0))
-		self.display.blit(background,background.get_rect())
+		background_rect = background.get_rect()
+		background_rect.center = (self.display.get_width()//2,self.display.get_height()//2)
+		self.display.blit(background,background_rect)
 		self.display.flip()
 
 		rects = []
 
 		#Create title text 'EuchreAI'
-		font = pygame.font.Font(pygame.font.get_default_font(), 60) 
+		font = pygame.font.Font(pygame.font.get_default_font(), self.display.get_height()//12) 
 		text = font.render('EuchreAI', True, (255,255,255)) 
 		text_rect = text.get_rect()  
-		text_rect.center = (320,50) 
+		text_rect.center = (self.display.get_width()//2,self.display.get_height()//12) 
 		self.display.blit(text,text_rect) 
 		rects.append(text_rect)
 
 		#Image
 		image = pygame.image.load('config/card_imgs/readme_img.jpg').convert_alpha()
-		image = pygame.transform.smoothscale(image, (400, 250))
+		image = pygame.transform.smoothscale(image, (self.display.get_width()//2,self.display.get_height()//2))
 		image_rect = image.get_rect()
-		image_rect.center = (320,250)
+		image_rect.center = (self.display.get_width()//2,self.display.get_height()//2)
 		self.display.blit(image,image_rect)
 		rects.append(image_rect)
 
 		#Button
-		button = pygame.Surface((100,50))
+		button = pygame.Surface((self.display.get_width()//6,self.display.get_height()//12))
 		button.fill((245,245,245))
 		button_rect = button.get_rect()
-		button_rect.center = (320,450)
+		button_rect.center = (self.display.get_width()//2,self.display.get_height()//10*9)
 		self.display.blit(button,button_rect)
 		rects.append(button_rect)
 
 		#Button text
-		font = pygame.font.Font(pygame.font.get_default_font(), 30) 
+		font = pygame.font.Font(pygame.font.get_default_font(), self.display.get_height()//12) 
 		button_text = font.render('PLAY', True, (0,0,0)) 
 		button_text_rect = button_text.get_rect()  
-		button_text_rect.center = (320,450) 
+		button_text_rect.center = (self.display.get_width()//2,self.display.get_height()//10*9)
 		self.display.blit(button_text,button_text_rect) 
 		rects.append(button_text_rect)
 
@@ -663,11 +667,16 @@ class Game:
 				elif event.type == pygame.MOUSEBUTTONUP:
 					pos = pygame.mouse.get_pos()
 					if button_rect.collidepoint(pos):
-						background = pygame.Surface((640,480))
+						background = pygame.Surface((self.display.get_width(),self.display.get_height()))
 						background.fill((0,128,0))
-						self.display.blit(background,background.get_rect())
+						background_rect = background.get_rect()
+						background_rect.center = (self.display.get_width()//2,self.display.get_height()//2)
+						self.display.blit(background,background_rect)
 						self.display.flip()
 						self.display.pump()
+						self.display.clear_table()
+						self.display.update_announcement('Welcome to EuchreAI! Goodluck!')
+						self.display.update_score([0,0])
 						self.play_game()
 		self.display.quit()
 

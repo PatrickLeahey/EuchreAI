@@ -15,6 +15,7 @@ class Player:
 		self.order = 'NA'
 		self.is_user = False
 		self.name = ''
+		self.seat = None
 
 		#Player Stats
 		#Stats increase for higher integers
@@ -52,6 +53,12 @@ class Player:
 
 	def get_name(self):
 		return self.name
+
+	def set_seat(self,seat):
+		self.seat = seat
+
+	def get_seat(self):
+		return self.seat
 
 	def get_lead_with_trump(self):
 		return self.lead_with_trump 
