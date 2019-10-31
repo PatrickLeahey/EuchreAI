@@ -2,12 +2,16 @@ class Hand:
 
 	def __init__(self):
 		self.cards = []
+		self.rects = []
 
 	def get_cards(self):
 		return self.cards
 
 	def add_card(self,card):
 		self.cards.append(card)
+
+	def set_rects(self,rects):
+		self.rects = []
 
 	def remove_card(self,card):
 		self.cards.remove(card)

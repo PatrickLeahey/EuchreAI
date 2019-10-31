@@ -7,6 +7,7 @@ class Card:
 		self.worth = int(worth)
 		self.is_left = False
 		self.img_path = img_path
+		self.rect = None
 	
 	def get_suit(self):
 		return self.suit
@@ -19,6 +20,12 @@ class Card:
 
 	def get_img_path(self):
 		return self.img_path
+
+	def set_rect(self, rect):
+		self.rect = rect
+
+	def get_rect(self):
+		return self.rect
 
 	#6 was chosen because a 9 of trump can beat any non-trump ace
 	def set_trump(self): 
