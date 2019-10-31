@@ -4,7 +4,6 @@ from Table import Table
 from Display import Display
 import config.play_config as con
 import pygame
-from pygame.locals import *
 
 class Game:
 	#Instantiate Game Instance
@@ -31,34 +30,61 @@ class Game:
 		self.table.set_players(players)
 
 	def display_hand(self):
+		self.display.pump()
+		game_on = True
+		while game_on == True:
 
-		background = pygame.Surface((400,50))
-		background.fill((0,128,255))
-		background_rect = background.get_rect()
-		background_rect.center = (320,420)
-		self.display.blit(background,background_rect)
-		self.display.update(background_rect)
+			for event in self.display.get_events():
+				if event.type == pygame.QUIT:
+					game_on == False
+
+				else:
+					self.display.pump()
+					background = pygame.Surface((500,200))
+					background.fill((0,128,0))
+					background_rect = background.get_rect()
+					background_rect.center = (320,370)
+					self.display.blit(background,background_rect)
+					self.display.update(background_rect)
+					self.display.pump()
+					rects = []
+					self.display.pump()
+
+					for i,card in zip(range(len(self.user_player.get_hand().get_cards())),self.user_player.get_hand().get_cards()):
+						self.display.pump()
+						img_path = card.get_img_path()
+						self.display.pump()
+						image = pygame.image.load(img_path).convert_alpha()
+
+						self.display.pump()
+						image = pygame.transform.smoothscale(image, (60,120))
+						image_rect = image.get_rect()
+						self.display.pump()
+						image_rect.center = (155.5 + i * 85, 370)
+						self.display.pump()
+						
+						rects.append(image_rect)
+						self.display.blit(image,image_rect)
+
+						#Add rect to card object
+						card.set_rect(image_rect)
+
+						self.display.update(image_rect)
+
+					self.display.pump()
+
+					#Add rects to Hand object 
+					self.user_player.get_hand().set_rects(rects)
+
+					#Update display
+					#self.display.update(rects)
+
+					return 
+
+		self.display.quit()
+
+
 		
-		rects = []
-
-		for i,card in zip(range(len(self.user_player.get_hand().get_cards())),self.user_player.get_hand().get_cards()):
-			img_path = card.get_img_path()
-			
-			image = pygame.image.load(img_path).convert_alpha()
-			image = pygame.transform.smoothscale(image, (100, 50))
-			image_rect = image.get_rect()
-			image_rect.center = (200 + i * 35, 445)
-			rects.append(image_rect)
-			self.display.blit(image,image_rect)
-
-			#Add rect to card object
-			card.set_rect(image_rect)
-
-		#Add rects to Hand object 
-		self.user_player.get_hand().set_rects(rects)
-
-		#Update display
-		self.display.update(rects)
 
 	#Deal the cards to the players
 	#5 cards each
@@ -66,6 +92,7 @@ class Game:
 
 		#GUI version
 		if self.user:
+			self.display.pump()
 			game_on = True
 			while game_on == True:
 
@@ -493,6 +520,7 @@ class Game:
 	def play_game(self):
 
 		if self.user:
+			self.display.pump()
 
 			score = [0,0]
 			num_round = 1
@@ -639,6 +667,7 @@ class Game:
 						background.fill((0,128,0))
 						self.display.blit(background,background.get_rect())
 						self.display.flip()
+						self.display.pump()
 						self.play_game()
 		self.display.quit()
 

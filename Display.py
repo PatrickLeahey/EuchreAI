@@ -1,5 +1,4 @@
 import pygame
-from pygame.locals import *
 
 class Display:
 
@@ -37,3 +36,9 @@ class Display:
 
 	def quit(self):
 		pygame.quit()
+
+	def get_error(self):
+		pygame.get_error()
+
+	def pump(self):
+		pygame.event.pump()
