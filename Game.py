@@ -4,6 +4,7 @@ from Table import Table
 from Display import Display
 import config.play_config as con
 import pygame
+import datetime
 
 class Game:
 	#Instantiate Game Instance
@@ -14,6 +15,8 @@ class Game:
 		self.user = False
 		self.user_player = None
 		self.display = None
+		
+		random.seed(datetime.datetime.now().strftime('%S'))
 
 	def get_players(self):
 		return self.table.get_players()
@@ -121,7 +124,6 @@ class Game:
 			game_on = True
 			while game_on == True:
 
-
 				self.display.prompt_event()
 
 				for event in self.display.get_events():
@@ -144,19 +146,25 @@ class Game:
 							#Otherwise, do the following
 							if True not in [p.get_went_alone() for p in self.table.get_players() if player.get_team() == p.get_team()]:
 
+								self.display.set_current(player)
+
 								if player == self.user_player:
-									played_so_far.append(self.display.select_card(self.user_player))
-								else:
-									played_so_far.append(player.play_card(played_so_far))
-							
-								if player.get_is_user():
 									if not played_so_far:
 										self.display.update_announcement("It's your turn to lead")
 
+									played_so_far.append(self.display.select_card(self.user_player))
+									self.display.add_card_to_table(played_so_far[-1].get_img_path(),len(played_so_far),False)
+									self.display.display_hand(self.user_player.get_hand().get_cards())
+								
 								else:
+									played_so_far.append(player.play_card(played_so_far))
+						
 									self.display.update_announcement(f"Player {player.get_name()} played {played_so_far[-1].get_value()} of {played_so_far[-1].get_suit()}'s")
 									self.display.add_card_to_table(played_so_far[-1].get_img_path(),len(played_so_far),False)
-									self.display.wait(1000)
+									
+									self.display.wait(750)
+
+								self.display.unset_current(player)
 
 
 						#Generate score of format score = [0,1] or [1,0] as only one team can win
@@ -181,6 +189,7 @@ class Game:
 
 						if self.user:
 							self.display.update_announcement(f'Team {winning_team} won the trick!')
+							self.display.wait(750)
 
 						if winning_team == 0:
 							score = [1,0]
@@ -191,6 +200,7 @@ class Game:
 						for player in self.table.get_players():
 							player.add_to_player_score(score[player.get_team()])
 
+						self.display.clear_table()
 						return score
 
 		#Non-GUI version
@@ -280,6 +290,8 @@ class Game:
 						picked_up_round = ''
 
 						for player in self.table.get_players():
+							self.display.set_current(player)
+
 							#Which team is dealing - we want to be able to tell this information to the players when they're betting
 							dealer_team = [player.get_team() for player in self.table.get_players() if player.is_dealer()][0]
 
@@ -300,17 +312,22 @@ class Game:
 										s = 'Spades'
 
 									self.display.update_announcement(f'Player {player.get_name()} chose {s} as trump suit for team {player.get_team()}')
+									self.display.wait(750)
 
 							if bet != '':
 								picked_up = True
 								picked_up_round = 0
 								trump_suit = flipped_card.get_desc()[0]
+								self.display.unset_current(player)
+
 
 								break
 
 							else:
 								if self.user:
 									self.display.update_announcement(f'Player {player.get_name()} passed')
+									self.display.unset_current(player)
+									self.display.wait(100)
 
 						#Second round betting
 						if picked_up == False:
@@ -324,6 +341,7 @@ class Game:
 								
 								else:
 									bet = player.bet(flipped_card,dealer_team,1)
+
 									if bet != '':
 										if bet == 'H':
 											s = 'Hearts'
@@ -334,6 +352,7 @@ class Game:
 										else:
 											s = 'Spades'
 										self.display.update_announcement(f'Player {player.get_name()} chose {s} as trump suit for team {player.get_team()}')
+										self.display.wait(750)
 
 								if bet != '':
 									self.display.clear_table()
@@ -344,6 +363,7 @@ class Game:
 								else:
 									if self.user:
 										self.display.update_announcement(f'Player {player.get_name()} passed')
+										self.display.wait(300)
 
 						if trump_suit != '':
 							self.display.clear_table()
@@ -574,12 +594,13 @@ class Game:
 
 						num_round = num_round + 1
 
-					if self.user:
+			if self.user:
 
-						winner_number = 0 if score[0] > score[1] else 1
-					
-						self.display.update_announcement(f'GAME OVER! Team {winner_number} is victorious!')
+				winner_number = 0 if score[0] > score[1] else 1
+			
+				self.display.update_announcement(f'GAME OVER! Team {winner_number} is victorious!')
 
+			#Quit button - make 
 			self.display.quit()
 
 

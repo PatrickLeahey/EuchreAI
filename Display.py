@@ -195,24 +195,41 @@ class Display:
 						rects.append(image_rect)
 						self.blit(image,image_rect)
 						self.update(image_rect)
-						self.wait(300)
+						self.wait(100)
 
 					self.pump()
 
 					return rects
 
+
+	def set_current(self,player):
+		player_seat = player.get_seat()
+
+		pygame_circ = pygame.draw.circle(self.display,(6, 30, 250),(player_seat[0] + self.height//10,player_seat[1]),self.width//120)
+
+	def unset_current(self,player):
+		player_seat = player.get_seat()
+
+		background = pygame.Surface((self.get_width()//30,self.get_height()//30))
+		background.fill((0,128,0))
+		background_rect = background.get_rect()
+		background_rect.center = (player_seat[0]+ self.height//10,player_seat[1])
+		self.blit(background,background_rect)
+
+		self.update(background_rect)
+
 	def set_dealer(self,dealer):
 		dealer_seat = dealer.get_seat()
 
-		pygame_circ = pygame.draw.circle(self.display,(252, 186, 3),(dealer_seat[0],dealer_seat[1] + self.height//30),self.width//100)
+		pygame_circ = pygame.draw.circle(self.display,(252, 186, 3),(dealer_seat[0] - self.height//10,dealer_seat[1]),self.width//120)
 
 	def unset_dealer(self,dealer):
 		dealer_seat = dealer.get_seat()
 
-		background = pygame.Surface((self.get_width()//50,self.get_height()//50))
+		background = pygame.Surface((self.get_width()//30,self.get_height()//30))
 		background.fill((0,128,0))
-		background_rect = button.get_rect()
-		background_rect.center = (dealer_seat[0],dealer_seat[1] + self.height//30)
+		background_rect = background_rect.get_rect()
+		background_rect.center = (dealer_seat[0] - self.height//10,dealer_seat[1])
 		self.blit(background,background_rect)
 
 		self.update(background_rect)
@@ -283,6 +300,15 @@ class Display:
 						suit_index = [suit_rect.collidepoint(pos) for suit_rect in rects].index(True)
 						selected_suit = suits[suit_index]
 
+						self.pump()
+						background = pygame.Surface((self.width//20,self.height/1.5))
+						background.fill((0,128,0))
+						background_rect = background.get_rect(center = self.suit_rects[2])
+						self.display.blit(background,background_rect)
+						self.update(background_rect)
+
+						self.pump()
+
 						if selected_suit == 'H':
 							s = 'Hearts'
 						elif selected_suit == 'D':
@@ -317,5 +343,6 @@ class Display:
 						print('User clicked on card')
 						card_index = [card_rect.collidepoint(pos) for card_rect in user.get_hand().get_rects()].index(True)
 						selected_card = [card for card in user.get_hand().get_cards()][card_index]
+						user.get_hand().remove_card(selected_card)
 						return selected_card
 						
