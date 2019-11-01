@@ -11,7 +11,10 @@ class Hand:
 		self.cards.append(card)
 
 	def set_rects(self,rects):
-		self.rects = []
+		self.rects = rects
+
+	def get_rects(self):
+		return self.rects
 
 	def remove_card(self,card):
 		self.cards.remove(card)

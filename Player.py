@@ -32,6 +32,7 @@ class Player:
 
 	def set_is_user(self):
 		self.is_user = True
+		self.name = 'You'
 
 	def get_is_user(self):
 		return self.is_user
