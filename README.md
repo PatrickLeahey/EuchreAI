@@ -13,8 +13,8 @@ These instructions will clone a copy of the project and get it up and running on
 
 ### Prerequisites
 
-You must have Python 3 and pygame installed
-[Click here for pygame documentation](https://www.pygame.org/docs/)
+You must download and install Python 3 and 
+[Pygame](https://www.pygame.org/docs/)
 
 ```
 pip install pygame
