@@ -10,6 +10,11 @@ These instructions will get you a copy of the project up and running on your loc
 ### Prerequisites
 
 You must have Python 3 installed
+Install Pygame
+
+```
+pip install pygame
+```
 
 ### Cloning this repository
 
@@ -30,6 +35,6 @@ python Train.py
 Change configuration parameters in config/play_config.py. Then run below:
 
 ```
-python test_game.py
+python Euchre.py
 ```
 
