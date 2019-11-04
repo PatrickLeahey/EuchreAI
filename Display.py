@@ -17,6 +17,7 @@ class Display:
 		self.button_rect = (self.width//20,self.height//10*2)
 		self.suit_rects = [(self.width//20,self.height//10*3),(self.width//20,self.height//10*4), \
 							(self.width//20,self.height//10*5),(self.width//20,self.height//10*6)]
+		self.trick_score_center = (self.width//2,self.height//20)
 
 		#Create main surface (display) and set Window title
 		pygame.display.set_caption('EuchreAI')
@@ -111,8 +112,8 @@ class Display:
 		if backs:
 			for i in range(num-1):
 				self.pump()
-				image = pygame.image.load('config/card_imgs/back.jpg').convert_alpha()
-				image = pygame.transform.smoothscale(image, (self.width//10,self.height//3))
+				image = pygame.image.load('config/card_imgs/back.png').convert_alpha()
+				image = pygame.transform.smoothscale(image, (self.width//9,self.height//3))
 				image_rect = image.get_rect()
 				image_rect.centery = self.table_rect.centery
 				self.pump()
@@ -126,7 +127,7 @@ class Display:
 		self.pump()
 
 		image = pygame.image.load(img).convert_alpha()
-		image = pygame.transform.smoothscale(image, (self.width//10,self.height//3))
+		image = pygame.transform.smoothscale(image, (self.width//9,self.height//3))
 
 		self.pump()
 
@@ -183,8 +184,8 @@ class Display:
 					self.pump()
 					for i,card in zip(range(len(hand)),hand):
 						img_path = card.get_img_path()
-						image = pygame.image.load(img_path).convert_alpha()
-						image = pygame.transform.smoothscale(image, (self.get_width()//10,self.get_height()//6))
+						image = pygame.image.load(img_path)
+						image = pygame.transform.smoothscale(image, (self.get_width()//10,self.get_height()//6)).convert_alpha()
 						image_rect = image.get_rect()
 						space = self.get_width()//50
 						start_left = self.get_width()//2 - (2 * space) - (2 * self.get_width()//8)
@@ -205,7 +206,7 @@ class Display:
 	def set_current(self,player):
 		player_seat = player.get_seat()
 
-		pygame_circ = pygame.draw.circle(self.display,(6, 30, 250),(player_seat[0] + self.height//10,player_seat[1]),self.width//120)
+		pygame_circ = pygame.draw.circle(self.display,(6, 30, 250),(player_seat[0] + self.height//7,player_seat[1]),self.width//120)
 
 	def unset_current(self,player):
 		player_seat = player.get_seat()
@@ -213,7 +214,7 @@ class Display:
 		background = pygame.Surface((self.get_width()//30,self.get_height()//30))
 		background.fill((0,128,0))
 		background_rect = background.get_rect()
-		background_rect.center = (player_seat[0]+ self.height//10,player_seat[1])
+		background_rect.center = (player_seat[0]+ self.height//7,player_seat[1])
 		self.blit(background,background_rect)
 
 		self.update(background_rect)
@@ -221,7 +222,7 @@ class Display:
 	def set_dealer(self,dealer):
 		dealer_seat = dealer.get_seat()
 
-		pygame_circ = pygame.draw.circle(self.display,(252, 186, 3),(dealer_seat[0] - self.height//10,dealer_seat[1]),self.width//120)
+		pygame_circ = pygame.draw.circle(self.display,(252, 186, 3),(dealer_seat[0] - self.height//7,dealer_seat[1]),self.width//120)
 
 	def unset_dealer(self,dealer):
 		dealer_seat = dealer.get_seat()
@@ -229,12 +230,77 @@ class Display:
 		background = pygame.Surface((self.get_width()//30,self.get_height()//30))
 		background.fill((0,128,0))
 		background_rect = background_rect.get_rect()
-		background_rect.center = (dealer_seat[0] - self.height//10,dealer_seat[1])
+		background_rect.center = (dealer_seat[0] - self.height//7,dealer_seat[1])
 		self.blit(background,background_rect)
 
 		self.update(background_rect)
 
+	def update_trick_score(self,score):
+
+		line = pygame.Surface((2,self.get_height()//30))
+		line.fill((0,0,0))
+		line_rect = line.get_rect(center = self.trick_score_center)
+		self.blit(line,line_rect)
+		self.update(line_rect)
+
+		rects = []
+
+		for i in range(score[0]):
+			pygame_circ = pygame.draw.circle(self.display,(224, 22, 22),(self.trick_score_center[0] - (i+1)  * 45,self.trick_score_center[1]),self.width//120)
+			rects.append(pygame_circ)
+
+		for i in range(score[1]):
+			pygame_circ = pygame.draw.circle(self.display,(224, 22, 22),(self.trick_score_center[0] + (i+1) * 45,self.trick_score_center[1]),self.width//120)
+			rects.append(pygame_circ)
+
+		self.update(rects)
+
+	def update_suit(self,suit):
+		
+		self.pump()
+
+		if suit == 'H':
+			img_path = 'config/card_imgs/heart.png'
+		elif suit == 'D':
+			img_path = 'config/card_imgs/diamond.png'
+		elif suit == 'C':
+			img_path = 'config/card_imgs/club.png'
+		else:
+			img_path = 'config/card_imgs/spade.png'
+
+		self.pump()
+		background = pygame.Surface((self.width//20,self.height/1.5))
+		background.fill((0,128,0))
+		background_rect = background.get_rect(center = self.suit_rects[2])
+		self.display.blit(background,background_rect)
+		self.update(background_rect)
+
+		self.pump()
+		image = pygame.image.load(img_path).convert_alpha()
+		image = pygame.transform.smoothscale(image, (self.get_width()//20,self.get_height()//15))
+		image_rect = image.get_rect()
+		image_rect.center = self.button_rect
+
+		self.pump()
+		
+		self.blit(image,image_rect)
+
+		self.update(image_rect)
+
+	def cover_suits(self):
+
+		self.pump()
+		background = pygame.Surface((self.width//20,self.height//3*2))
+		background.fill((0,128,0))
+		background_rect = background.get_rect(center = self.suit_rects[2])
+		self.display.blit(background,background_rect)
+		self.update(background_rect)
+		self.pump()
+
 	def select_suit(self,suits):
+
+		self.cover_suits()
+
 		suit_paths = []
 
 		self.update_announcement('Click on a suit to call it trump')
@@ -243,13 +309,13 @@ class Display:
 
 		for suit in suits:
 			if suit == 'H':
-				suit_paths.append('config/card_imgs/heart.jpg')
+				suit_paths.append('config/card_imgs/heart.png')
 			elif suit == 'D':
 				suit_paths.append('config/card_imgs/diamond.png')
 			elif suit == 'C':
-				suit_paths.append('config/card_imgs/club.jpg')
+				suit_paths.append('config/card_imgs/club.png')
 			else:
-				suit_paths.append('config/card_imgs/spade.jpg')
+				suit_paths.append('config/card_imgs/spade.png')
 
 		rects = []
 
@@ -300,12 +366,11 @@ class Display:
 						suit_index = [suit_rect.collidepoint(pos) for suit_rect in rects].index(True)
 						selected_suit = suits[suit_index]
 
+						#self.cover_suits()
+
 						self.pump()
-						background = pygame.Surface((self.width//20,self.height/1.5))
-						background.fill((0,128,0))
-						background_rect = background.get_rect(center = self.suit_rects[2])
-						self.display.blit(background,background_rect)
-						self.update(background_rect)
+
+						self.update_suit(selected_suit)
 
 						self.pump()
 
@@ -325,7 +390,7 @@ class Display:
 						self.update_announcement(f'You passed')
 						return ''
 
-	def select_card(self,user):
+	def select_card(self,user,played_so_far):
 
 		self.update_announcement('Click a card to play it')
 
@@ -340,9 +405,34 @@ class Display:
 					pos = pygame.mouse.get_pos()
 		
 					if True in [card_rect.collidepoint(pos) for card_rect in user.get_hand().get_rects()]:
-						print('User clicked on card')
+
 						card_index = [card_rect.collidepoint(pos) for card_rect in user.get_hand().get_rects()].index(True)
 						selected_card = [card for card in user.get_hand().get_cards()][card_index]
-						user.get_hand().remove_card(selected_card)
-						return selected_card
+
+						#If the user if following 
+						if len(played_so_far) != 0:
+
+							#If trump was led and the user has the left, but didn't play it 
+							if played_so_far[0].get_is_trump() and \
+														selected_card.get_suit() != played_so_far[0].get_suit() and \
+														True in [card.get_is_left() for card in user.get_hand().get_cards()]:
+								self.update_announcement('You must follow suit!')
+
+
+							#If user has card of led suit and didn't play it
+							elif True in [card.get_suit()==played_so_far[0].get_suit() for card in user.get_hand().get_cards()] \
+														and selected_card.get_suit() != played_so_far[0].get_suit():
+								self.update_announcement('You must follow suit!')
+
+							else:
+								user.get_hand().remove_card(selected_card)
+								return selected_card
+
+
+
+
+
+
+
+
 						

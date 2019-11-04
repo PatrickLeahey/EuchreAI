@@ -152,7 +152,7 @@ class Game:
 									if not played_so_far:
 										self.display.update_announcement("It's your turn to lead")
 
-									played_so_far.append(self.display.select_card(self.user_player))
+									played_so_far.append(self.display.select_card(self.user_player,played_so_far))
 									self.display.add_card_to_table(played_so_far[-1].get_img_path(),len(played_so_far),False)
 									self.display.display_hand(self.user_player.get_hand().get_cards())
 								
@@ -312,12 +312,13 @@ class Game:
 										s = 'Spades'
 
 									self.display.update_announcement(f'Player {player.get_name()} chose {s} as trump suit for team {player.get_team()}')
-									self.display.wait(750)
+									self.display.wait(1000)
 
 							if bet != '':
 								picked_up = True
 								picked_up_round = 0
 								trump_suit = flipped_card.get_desc()[0]
+								self.display.update_suit(trump_suit)
 								self.display.unset_current(player)
 
 
@@ -327,11 +328,12 @@ class Game:
 								if self.user:
 									self.display.update_announcement(f'Player {player.get_name()} passed')
 									self.display.unset_current(player)
-									self.display.wait(100)
+									self.display.wait(1000)
 
 						#Second round betting
 						if picked_up == False:
 							for player in self.table.get_players():
+								self.display.set_current(player)
 
 								all_suits = ['H','D','C','S']
 								all_suits.remove(flipped_card.get_suit())
@@ -352,18 +354,20 @@ class Game:
 										else:
 											s = 'Spades'
 										self.display.update_announcement(f'Player {player.get_name()} chose {s} as trump suit for team {player.get_team()}')
-										self.display.wait(750)
+										self.display.wait(1000)
 
 								if bet != '':
 									self.display.clear_table()
 									picked_up = True
 									trump_suit = bet
+									self.display.update_suit(trump_suit)
+									self.display.unset_current(player)
 
 									break
 								else:
 									if self.user:
 										self.display.update_announcement(f'Player {player.get_name()} passed')
-										self.display.wait(300)
+										self.display.wait(1000)
 
 						if trump_suit != '':
 							self.display.clear_table()
@@ -389,6 +393,7 @@ class Game:
 								score0,score1 = self.play_trick()
 								score[0] = score[0] + score0
 								score[1] = score[1] + score1
+								self.display.update_trick_score(score)
 							
 							#Score based on number of tricks won
 
@@ -455,103 +460,104 @@ class Game:
 								self.display.update_announcement('Neither team wanted to bet')
 								
 							return [0,0]
+		else:
+			
+			#Initial deal of cards
+			dealer_index = self.next_dealer()
+			self.deal()
 
-		#Initial deal of cards
-		dealer_index = self.next_dealer()
-		self.deal()
+			#Remainder of cards in self.deck (4) are the kitty -- select the card on top
+			flipped_card = self.deck.get_cards()[3]
 
-		#Remainder of cards in self.deck (4) are the kitty -- select the card on top
-		flipped_card = self.deck.get_cards()[3]
+			trump_suit = ''
+			dealer_team = ''
 
-		trump_suit = ''
-		dealer_team = ''
+			#First roound betting
+			picked_up = False
+			picked_up_round = ''
 
-		#First roound betting
-		picked_up = False
-		picked_up_round = ''
-
-		for player in self.table.get_players():
-			#Which team is dealing - we want to be able to tell this information to the players when they're betting
-			dealer_team = [player.get_team() for player in self.table.get_players() if player.is_dealer()][0]
-
-			bet = player.bet(flipped_card,dealer_team,0)
-			if bet != '':
-				picked_up = True
-				picked_up_round = 0
-				trump_suit = flipped_card.get_desc()[0]
-				break
-
-		#Second round betting
-		if picked_up == False:
 			for player in self.table.get_players():
-				bet = player.bet(flipped_card,dealer_team,1)
+				#Which team is dealing - we want to be able to tell this information to the players when they're betting
+				dealer_team = [player.get_team() for player in self.table.get_players() if player.is_dealer()][0]
+
+				bet = player.bet(flipped_card,dealer_team,0)
 				if bet != '':
 					picked_up = True
-					trump_suit = bet
+					picked_up_round = 0
+					trump_suit = flipped_card.get_desc()[0]
 					break
-		
 
-		if trump_suit != '':
-
-			for player in self.table.get_players():
-				player.get_hand().set_trump(trump_suit)
-
-			if picked_up_round == 0:
-				#Dealer drops one of their cards
-				#Dealer picks up flipped card
-				dealer_index = [player.is_dealer() for player in self.table.get_players()].index(True)
-				#Dealer decide which card to drop -- their worst card unless the flipped card is worse than all
-				dealer_cards = self.table.get_players()[dealer_index].get_hand().get_cards()
-				dealer_card_vals = [card.get_worth() for card in dealer_cards]
-				dealer_worst_card = sorted(dealer_card_vals)[0]
-				remove_card = dealer_cards[dealer_card_vals.index(dealer_worst_card)]
-				if flipped_card.get_worth() + 6 < remove_card.get_worth():
-					remove_card = flipped_card
-				self.table.get_players()[dealer_index].get_hand().add_card(flipped_card)
-				self.table.get_players()[dealer_index].get_hand().remove_card(remove_card)
-
-			score = [0,0]
-			for _ in range(5):
-				score0,score1 = self.play_trick()
-				score[0] = score[0] + score0
-				score[1] = score[1] + score1
+			#Second round betting
+			if picked_up == False:
+				for player in self.table.get_players():
+					bet = player.bet(flipped_card,dealer_team,1)
+					if bet != '':
+						picked_up = True
+						trump_suit = bet
+						break
 			
-			#Score based on number of tricks won
 
-			#Need to know this so we can see if a team got euchred or not
-			#And whether one player went alone
-			team_called_trump = None
-			went_alone = None
-			for player in self.table.get_players():
-				if player.get_called_trump():
-					team_called_trump = player.get_team()
-					if player.get_went_alone():
-						went_alone = player.get_team()
+			if trump_suit != '':
+
+				for player in self.table.get_players():
+					player.get_hand().set_trump(trump_suit)
+
+				if picked_up_round == 0:
+					#Dealer drops one of their cards
+					#Dealer picks up flipped card
+					dealer_index = [player.is_dealer() for player in self.table.get_players()].index(True)
+					#Dealer decide which card to drop -- their worst card unless the flipped card is worse than all
+					dealer_cards = self.table.get_players()[dealer_index].get_hand().get_cards()
+					dealer_card_vals = [card.get_worth() for card in dealer_cards]
+					dealer_worst_card = sorted(dealer_card_vals)[0]
+					remove_card = dealer_cards[dealer_card_vals.index(dealer_worst_card)]
+					if flipped_card.get_worth() + 6 < remove_card.get_worth():
+						remove_card = flipped_card
+					self.table.get_players()[dealer_index].get_hand().add_card(flipped_card)
+					self.table.get_players()[dealer_index].get_hand().remove_card(remove_card)
+
+				score = [0,0]
+				for _ in range(5):
+					score0,score1 = self.play_trick()
+					score[0] = score[0] + score0
+					score[1] = score[1] + score1
+				
+				#Score based on number of tricks won
+
+				#Need to know this so we can see if a team got euchred or not
+				#And whether one player went alone
+				team_called_trump = None
+				went_alone = None
+				for player in self.table.get_players():
+					if player.get_called_trump():
+						team_called_trump = player.get_team()
+						if player.get_went_alone():
+							went_alone = player.get_team()
 
 
-			if score[0] > score[1]:
-				if score[0] == 5:
-					return [2,0]
-				elif team_called_trump == 1:
-					return [2,0]
-				elif went_alone == 0 and score[0] == 5:
-					return [4,0]
-				else: 
-					return [1,0]
+				if score[0] > score[1]:
+					if score[0] == 5:
+						return [2,0]
+					elif team_called_trump == 1:
+						return [2,0]
+					elif went_alone == 0 and score[0] == 5:
+						return [4,0]
+					else: 
+						return [1,0]
 
+				else:
+					if score[1] == 5:
+						return [0,2]
+					elif team_called_trump == 0:
+						return [0,2]
+					elif went_alone == 1 and score[1] == 5:
+						return [0,4]
+					else: 
+						return [0,1]
+				
+			#The suit was not set during betting
 			else:
-				if score[1] == 5:
-					return [0,2]
-				elif team_called_trump == 0:
-					return [0,2]
-				elif went_alone == 1 and score[1] == 5:
-					return [0,4]
-				else: 
-					return [0,1]
-			
-		#The suit was not set during betting
-		else:
-			return [0,0]
+				return [0,0]
 
 	#A game is over when one team reaches 10 points
 	def play_game(self):
@@ -566,6 +572,8 @@ class Game:
 
 			game_on = True
 			while score[0] < 10 and score[1] < 10 and game_on == True:
+
+				self.display.prompt_event()
 				for event in self.display.get_events():
 					if event.type == pygame.QUIT:
 						game_on == False
@@ -630,12 +638,12 @@ class Game:
 
 	def create_user(self):
 		self.user = True
-		self.user_player = self.table.get_players()[0]
+		self.user_player = self.table.get_players()[2]
 		self.display = Display()
 
 		seats = [(int(self.display.get_width()//2),int(self.display.get_height()//9)), \
 			(int(self.display.get_width()//10*8.5),int(self.display.get_height()//2.4)), \
-			(int(self.display.get_width()//2),int(self.display.get_height()//10*7)), \
+			(int(self.display.get_width()//2),int(self.display.get_height()//10*7.3)), \
 			(int(self.display.get_width()//10*1.5),int(self.display.get_height()//2.4))]
 
 		self.display.pump()
@@ -672,15 +680,15 @@ class Game:
 		rects.append(text_rect)
 
 		#Image
-		image = pygame.image.load('config/card_imgs/readme_img.jpg').convert_alpha()
-		image = pygame.transform.smoothscale(image, (self.display.get_width()//2,self.display.get_height()//2))
+		image = pygame.image.load('config/card_imgs/readme_img.png')
+		image = pygame.transform.smoothscale(image, (self.display.get_width()//2,self.display.get_height()//2)).convert_alpha()
 		image_rect = image.get_rect()
 		image_rect.center = (self.display.get_width()//2,self.display.get_height()//2)
 		self.display.blit(image,image_rect)
 		rects.append(image_rect)
 
 		#Button
-		button = pygame.Surface((self.display.get_width()//6,self.display.get_height()//12))
+		button = pygame.Surface((self.display.get_width()//5,self.display.get_height()//12))
 		button.fill((245,245,245))
 		button_rect = button.get_rect()
 		button_rect.center = (self.display.get_width()//2,self.display.get_height()//10*9)
@@ -691,9 +699,17 @@ class Game:
 		font = pygame.font.Font(pygame.font.get_default_font(), self.display.get_height()//12) 
 		button_text = font.render('PLAY', True, (0,0,0)) 
 		button_text_rect = button_text.get_rect()  
-		button_text_rect.center = (self.display.get_width()//2,self.display.get_height()//10*9)
+		button_text_rect.center = button_rect.center
 		self.display.blit(button_text,button_text_rect) 
 		rects.append(button_text_rect)
+
+		#Developer Text
+		font = pygame.font.Font(pygame.font.get_default_font(), self.display.get_height()//60) 
+		dev_text = font.render('Developed by Patrick Leahey', True, (255,255,255)) 
+		dev_text_rect = dev_text.get_rect()  
+		dev_text_rect.center = (self.display.get_width()//13,self.display.get_height()//60*59)
+		self.display.blit(dev_text,dev_text_rect) 
+		rects.append(dev_text_rect)
 
 		#Update specific rectangles
 		self.display.update(rects)
