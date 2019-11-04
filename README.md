@@ -9,12 +9,12 @@ Allows for seamless training and gameplay
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+These instructions will clone a copy of the project and get it up and running on your local machine for development and testing purposes
 
 ### Prerequisites
 
-You must have Python 3 installed
-Install Pygame
+You must have Python 3 and pygame installed
+[Click here for pygame documentation](https://www.pygame.org/docs/)
 
 ```
 pip install pygame
