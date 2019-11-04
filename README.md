@@ -1,7 +1,11 @@
 # EuchreAI
 Genetic Algorithm Approach to Automated Euchre Bot
 
-![alt text](https://raw.githubusercontent.com/PatrickLeahey/EuchreAI/master/config/card_imgs/Capture.PNG)
+<p align="center">
+  <img width="460" height="300" src = ![alt text](https://raw.githubusercontent.com/PatrickLeahey/EuchreAI/master/config/card_imgs/Capture.PNG)>
+</p>
+
+
 
 ## Getting Started
 
