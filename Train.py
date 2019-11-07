@@ -1,6 +1,6 @@
 from Game import Game
 from Player import Player
-import config.train_config
+import config.train_config as train_config
 import random
 import pandas as pd
 import os

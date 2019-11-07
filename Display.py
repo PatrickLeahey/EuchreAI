@@ -81,6 +81,14 @@ class Display:
 		self.display.blit(text,self.score_rect) 
 		self.update(self.score_rect)
 
+	def update_team(self,team):
+		self.pump()
+		font = pygame.font.Font(pygame.font.get_default_font(), self.display.get_height()//60) 
+		text = font.render(f'You are on team: {team}', True, (255,255,255))    
+		text_rect = text.get_rect(center = (self.width//2,self.height//60))
+		self.display.blit(text,text_rect) 
+		self.update(text_rect)
+
 	def update_announcement(self,text):
 		#Cover area and print announcement text
 		self.pump()
@@ -255,6 +263,16 @@ class Display:
 
 		self.update(rects)
 
+	def cover_suits(self):
+
+		self.pump()
+		background = pygame.Surface((self.width//20,self.height//3*2))
+		background.fill((0,128,0))
+		background_rect = background.get_rect(center = self.suit_rects[2])
+		self.display.blit(background,background_rect)
+		self.update(background_rect)
+		self.pump()
+
 	def update_suit(self,suit):
 		
 		self.pump()
@@ -268,12 +286,7 @@ class Display:
 		else:
 			img_path = 'config/card_imgs/spade.png'
 
-		self.pump()
-		background = pygame.Surface((self.width//20,self.height/1.5))
-		background.fill((0,128,0))
-		background_rect = background.get_rect(center = self.suit_rects[2])
-		self.display.blit(background,background_rect)
-		self.update(background_rect)
+		self.cover_suits()
 
 		self.pump()
 		image = pygame.image.load(img_path).convert_alpha()
@@ -286,16 +299,6 @@ class Display:
 		self.blit(image,image_rect)
 
 		self.update(image_rect)
-
-	def cover_suits(self):
-
-		self.pump()
-		background = pygame.Surface((self.width//20,self.height//3*2))
-		background.fill((0,128,0))
-		background_rect = background.get_rect(center = self.suit_rects[2])
-		self.display.blit(background,background_rect)
-		self.update(background_rect)
-		self.pump()
 
 	def select_suit(self,suits):
 
@@ -398,6 +401,7 @@ class Display:
 		while user_clicked == False:
 			self.prompt_event()
 			for event in self.get_events():
+				print(event)
 				if event.type == pygame.QUIT:
 					self.quit()
 				elif event.type == pygame.MOUSEBUTTONUP:

@@ -80,7 +80,8 @@ class Game:
 			dealer_index = [player.is_dealer() for player in self.table.get_players()].index(True)
 
 			self.table.get_players()[dealer_index].toggle_dealer()
-			self.display.unset_dealer(self.table.get_players()[dealer_index])
+			if self.user:
+				self.display.unset_dealer(self.table.get_players()[dealer_index])
 
 			if dealer_index != 3:
 				lead_index = dealer_index + 1
@@ -111,7 +112,8 @@ class Game:
 				self.display.update_announcement(f'{dealer_name} is now dealer')
 
 		dealer = self.table.get_players()[[player.is_dealer() for player in self.table.get_players()].index(True)]
-		self.display.set_dealer(dealer)
+		if self.user:
+			self.display.set_dealer(dealer)
 
 		return dealer_index
 		
@@ -407,7 +409,8 @@ class Game:
 									if player.get_went_alone():
 										went_alone = player.get_team()
 
-							print('---------')
+
+							self.display.update_trick_score([0,0])
 
 							if score[0] > score[1]:
 								if self.user:
@@ -461,7 +464,7 @@ class Game:
 								
 							return [0,0]
 		else:
-			
+
 			#Initial deal of cards
 			dealer_index = self.next_dealer()
 			self.deal()
@@ -561,7 +564,6 @@ class Game:
 
 	#A game is over when one team reaches 10 points
 	def play_game(self):
-		print('Playing game')
 
 		if self.user:
 
@@ -736,5 +738,7 @@ class Game:
 							self.display.add_text(player.get_name(),player.get_seat())
 						self.display.update_announcement('Welcome to EuchreAI! Goodluck!')
 						self.display.update_score([0,0])
+						self.display.update_team(self.user_player.get_team())
+
 						self.play_game()
 
