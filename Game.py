@@ -291,6 +291,8 @@ class Game:
 						picked_up = False
 						picked_up_round = ''
 
+						self.display.display_suits(flipped_card.get_suit())
+
 						for player in self.table.get_players():
 							self.display.set_current(player)
 
@@ -334,11 +336,14 @@ class Game:
 
 						#Second round betting
 						if picked_up == False:
+
+							all_suits = ['H','D','C','S']
+							all_suits.remove(flipped_card.get_suit())
+
+							self.display.display_suits(all_suits)
+
 							for player in self.table.get_players():
 								self.display.set_current(player)
-
-								all_suits = ['H','D','C','S']
-								all_suits.remove(flipped_card.get_suit())
 
 								if player == self.user_player:
 									bet = self.display.select_suit(all_suits)
@@ -355,8 +360,10 @@ class Game:
 											s = 'Clubs'
 										else:
 											s = 'Spades'
-										self.display.update_announcement(f'Player {player.get_name()} chose {s} as trump suit for team {player.get_team()}')
+
 										self.display.wait(1000)
+										self.display.update_announcement(f'Player {player.get_name()} chose {s} as trump suit for team {player.get_team()}')
+										
 
 								if bet != '':
 									self.display.clear_table()
@@ -368,8 +375,10 @@ class Game:
 									break
 								else:
 									if self.user:
-										self.display.update_announcement(f'Player {player.get_name()} passed')
 										self.display.wait(1000)
+										self.display.update_announcement(f'Player {player.get_name()} passed')
+										self.display.unset_current(player)
+
 
 						if trump_suit != '':
 							self.display.clear_table()
@@ -682,7 +691,7 @@ class Game:
 		rects.append(text_rect)
 
 		#Image
-		image = pygame.image.load('config/card_imgs/readme_img.png')
+		image = pygame.image.load('config/card_imgs/title_img.png')
 		image = pygame.transform.smoothscale(image, (self.display.get_width()//2,self.display.get_height()//2)).convert_alpha()
 		image_rect = image.get_rect()
 		image_rect.center = (self.display.get_width()//2,self.display.get_height()//2)
@@ -731,6 +740,7 @@ class Game:
 						background_rect = background.get_rect()
 						background_rect.center = (self.display.get_width()//2,self.display.get_height()//2)
 						self.display.blit(background,background_rect)
+						self.display.display_credit_and_title()
 						self.display.flip()
 						self.display.clear_table()
 						self.user_player.set_is_user()
@@ -739,6 +749,7 @@ class Game:
 						self.display.update_announcement('Welcome to EuchreAI! Goodluck!')
 						self.display.update_score([0,0])
 						self.display.update_team(self.user_player.get_team())
+
 
 						self.play_game()
 

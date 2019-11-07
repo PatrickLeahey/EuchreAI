@@ -18,6 +18,7 @@ class Display:
 		self.suit_rects = [(self.width//20,self.height//10*3),(self.width//20,self.height//10*4), \
 							(self.width//20,self.height//10*5),(self.width//20,self.height//10*6)]
 		self.trick_score_center = (self.width//2,self.height//20)
+		self.rects = 'To_be_set'
 
 		#Create main surface (display) and set Window title
 		pygame.display.set_caption('EuchreAI')
@@ -109,6 +110,18 @@ class Display:
 		self.display.blit(image,self.table_rect)
 		self.update(self.table_rect)
 
+	def display_credit_and_title(self):
+		image = pygame.image.load('config/card_imgs/logo.png').convert_alpha()
+		image = pygame.transform.smoothscale(image, (self.width//10,self.width//10))
+		image_rect = image.get_rect(bottomright = (self.width-10,self.height-10))
+		self.blit(image,image_rect)
+		self.pump()
+		font = pygame.font.Font(pygame.font.get_default_font(), self.get_height()//60) 
+		word = font.render('Developed by Patrick Leahey', True, (255,255,255)) 
+		word_rect = word.get_rect(center = (self.get_width()//13,self.get_height()//60*59))
+		self.blit(word, word_rect)
+		self.update([image_rect,word_rect])
+
 	def add_card_to_table(self,img,num,backs):
 			
 		self.pump()
@@ -179,7 +192,7 @@ class Display:
 				else:
 					self.pump()
 
-					background = pygame.Surface((self.get_width(), self.get_height()//4))
+					background = pygame.Surface((self.get_width()//4*3, self.get_height()//6))
 					background.fill((0,128,0))
 					background_rect = background.get_rect()
 					background_rect.center = (self.get_width()//2,self.get_height()//8*7)
@@ -214,7 +227,7 @@ class Display:
 	def set_current(self,player):
 		player_seat = player.get_seat()
 
-		pygame_circ = pygame.draw.circle(self.display,(6, 30, 250),(player_seat[0] + self.height//7,player_seat[1]),self.width//120)
+		pygame_circ = pygame.draw.circle(self.display,(6, 30, 250),(player_seat[0],player_seat[1] + self.height//35),self.width//120)
 
 	def unset_current(self,player):
 		player_seat = player.get_seat()
@@ -222,7 +235,7 @@ class Display:
 		background = pygame.Surface((self.get_width()//30,self.get_height()//30))
 		background.fill((0,128,0))
 		background_rect = background.get_rect()
-		background_rect.center = (player_seat[0]+ self.height//7,player_seat[1])
+		background_rect.center = (player_seat[0],player_seat[1] + self.height//35)
 		self.blit(background,background_rect)
 
 		self.update(background_rect)
@@ -230,15 +243,24 @@ class Display:
 	def set_dealer(self,dealer):
 		dealer_seat = dealer.get_seat()
 
-		pygame_circ = pygame.draw.circle(self.display,(252, 186, 3),(dealer_seat[0] - self.height//7,dealer_seat[1]),self.width//120)
+		self.pump()
+
+		font = pygame.font.Font(pygame.font.get_default_font(), self.get_height()//45) 
+		words = font.render('DEALER', True, (252,186,3))    
+		words_rect = words.get_rect(center = (dealer_seat[0],dealer_seat[1] - self.height//35))
+		self.display.blit(words,words_rect) 
+
+		self.pump()
+
+		self.update(words_rect)
 
 	def unset_dealer(self,dealer):
 		dealer_seat = dealer.get_seat()
 
-		background = pygame.Surface((self.get_width()//30,self.get_height()//30))
+		background = pygame.Surface((self.get_width()//45,self.get_height()//45))
 		background.fill((0,128,0))
 		background_rect = background_rect.get_rect()
-		background_rect.center = (dealer_seat[0] - self.height//7,dealer_seat[1])
+		background_rect.center = (dealer_seat[0],dealer_seat[1] - self.height//35)
 		self.blit(background,background_rect)
 
 		self.update(background_rect)
@@ -300,7 +322,7 @@ class Display:
 
 		self.update(image_rect)
 
-	def select_suit(self,suits):
+	def display_suits(self,suits):
 
 		self.cover_suits()
 
@@ -357,6 +379,10 @@ class Display:
 
 		self.update(button_rect_actual)
 
+		self.rects = rects
+
+	def select_suit(self,suits):
+
 		user_clicked = False
 		while user_clicked == False:
 			self.prompt_event()
@@ -365,8 +391,8 @@ class Display:
 					self.quit()
 				elif event.type == pygame.MOUSEBUTTONUP:
 					pos = pygame.mouse.get_pos()
-					if True in [suit_rect.collidepoint(pos) for suit_rect in rects]:
-						suit_index = [suit_rect.collidepoint(pos) for suit_rect in rects].index(True)
+					if True in [suit_rect.collidepoint(pos) for suit_rect in self.rects]:
+						suit_index = [suit_rect.collidepoint(pos) for suit_rect in self.rects].index(True)
 						selected_suit = suits[suit_index]
 
 						#self.cover_suits()
@@ -389,7 +415,7 @@ class Display:
 						self.update_announcement(f'You selected {s} as trump')
 						return selected_suit
 
-					if button_rect_actual.collidepoint(pos):
+					if self.button_rect.collidepoint(pos):
 						self.update_announcement(f'You passed')
 						return ''
 

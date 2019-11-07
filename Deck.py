@@ -1,5 +1,6 @@
 import random
 from Card import Card
+import datetime
 
 class Deck:
 
@@ -44,6 +45,7 @@ class Deck:
 		return self.cards
 
 	def draw_card(self):
+		random.seed(datetime.datetime.now().strftime('%S'))
 		card = random.choice(self.cards)
 		self.cards.remove(card)
 		return card
