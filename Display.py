@@ -19,6 +19,7 @@ class Display:
 							(self.width//20,self.height//10*5),(self.width//20,self.height//10*6)]
 		self.trick_score_center = (self.width//2,self.height//20)
 		self.rects = 'To_be_set'
+		self.button_rect_actual = 'To_bet_set'
 
 		#Create main surface (display) and set Window title
 		pygame.display.set_caption('EuchreAI')
@@ -380,6 +381,7 @@ class Display:
 		self.update(button_rect_actual)
 
 		self.rects = rects
+		self.button_rect_actual = button_rect_actual
 
 	def select_suit(self,suits):
 
@@ -415,7 +417,7 @@ class Display:
 						self.update_announcement(f'You selected {s} as trump')
 						return selected_suit
 
-					if self.button_rect.collidepoint(pos):
+					if self.button_rect_actual.collidepoint(pos):
 						self.update_announcement(f'You passed')
 						return ''
 

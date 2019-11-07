@@ -714,13 +714,7 @@ class Game:
 		self.display.blit(button_text,button_text_rect) 
 		rects.append(button_text_rect)
 
-		#Developer Text
-		font = pygame.font.Font(pygame.font.get_default_font(), self.display.get_height()//60) 
-		dev_text = font.render('Developed by Patrick Leahey', True, (255,255,255)) 
-		dev_text_rect = dev_text.get_rect()  
-		dev_text_rect.center = (self.display.get_width()//13,self.display.get_height()//60*59)
-		self.display.blit(dev_text,dev_text_rect) 
-		rects.append(dev_text_rect)
+		self.display.display_credit_and_title()
 
 		#Update specific rectangles
 		self.display.update(rects)
