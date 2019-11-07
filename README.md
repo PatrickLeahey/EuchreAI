@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="300" height="300" src = https://raw.githubusercontent.com/PatrickLeahey/EuchreAI/master/config/card_imgs/Capture.PNG>
+  <img width="300" height="300" src = https://raw.githubusercontent.com/PatrickLeahey/EuchreAI/master/config/card_imgs/logo.png>
 </p>
 
 # EuchreAI
