@@ -8,7 +8,6 @@ from Window import Window
 import config.play_config as con
 import random
 
-
 def play(window):
 	game = Game()
 	game.set_window(window)

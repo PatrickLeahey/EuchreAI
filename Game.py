@@ -146,7 +146,8 @@ class Game:
 
 							#If the player's teammate went alone, skip their turn
 							#Otherwise, do the following
-							if True not in [p.get_went_alone() for p in self.table.get_players() if player.get_team() == p.get_team()]:
+							if True not in [p.get_went_alone() for p in self.table.get_players() if player.get_team() == p.get_team()] \
+								and not self.user_player.get_went_alone():
 
 								self.display.set_current(player)
 
@@ -183,7 +184,39 @@ class Game:
 						card_values = [card.get_worth() for card in played_so_far]
 						winning_value = sorted(card_values, reverse = True)[0]
 						winning_card = played_so_far[card_values.index(winning_value)]
-						winning_team = 'NA'
+
+						#We want to let the winner of the trick lead the next trick
+						#We need to get the player that won the trick to do this
+						#We need to find out if anyone went alone to help us not misidentify the winning player
+						partner_went_alone_index = None
+
+						for player,i in zip(self.table.get_players(),range(len(self.table.get_players()))):
+							if player.get_went_alone():
+								if i == 0:
+									partner_went_alone_index = 2
+								elif i == 1:
+									partner_went_alone_index = 3
+								elif i == 2:
+									partner_went_alone_index = 0
+								else:
+									partner_went_alone_index = 1
+
+						winner_index = played_so_far.index(winning_card)
+
+						if partner_went_alone_index == None:
+							#Partner did not go alone
+							#Set winner of trick first for next round
+							self.table.set_first(self.table.get_players()[winner_index])
+						else:
+							#Partner went alone
+							#Set winner of trick first for next round
+							#We account for the missing card by adding 1
+							if winner_index >= partner_went_alone_index:
+								self.table.set_first(self.table.get_players()[winner_index+1])
+							else:
+								self.table.set_first(self.table.get_players()[winner_index])
+
+						winning_team = None
 						if played_so_far.index(winning_card) in [0,2]:
 							winning_team = self.table.get_players()[0].get_team()
 						else:
@@ -325,7 +358,6 @@ class Game:
 								self.display.update_suit(trump_suit)
 								self.display.unset_current(player)
 
-
 								break
 
 							else:
@@ -336,6 +368,7 @@ class Game:
 
 						#Second round betting
 						if picked_up == False:
+							self.display.clear_table()
 
 							all_suits = ['H','D','C','S']
 							all_suits.remove(flipped_card.get_suit())
@@ -587,7 +620,7 @@ class Game:
 				self.display.prompt_event()
 				for event in self.display.get_events():
 					if event.type == pygame.QUIT:
-						game_on == False
+						self.display.quit()
 
 					else:
 						round_score = self.play_round()
@@ -612,15 +645,12 @@ class Game:
 									player.toggle_went_alone()
 
 						num_round = num_round + 1
+						self.display.update_score([0,0])
 
-			if self.user:
 
-				winner_number = 0 if score[0] > score[1] else 1
+			winner_number = 0 if score[0] > score[1] else 1
 			
-				self.display.update_announcement(f'GAME OVER! Team {winner_number} is victorious!')
-
-			#Quit button - make 
-			self.display.quit()
+			self.display.update_announcement(f'GAME OVER! Team {winner_number} is victorious!')
 
 
 		#If there is no user

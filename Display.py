@@ -107,6 +107,7 @@ class Display:
 
 	def clear_table(self):
 		image = pygame.image.load('config/card_imgs/wooden_tabletop.jpg').convert_alpha()
+		image.set_alpha(255)
 		image = pygame.transform.smoothscale(image, (self.width//2,self.height//2))
 		self.display.blit(image,self.table_rect)
 		self.update(self.table_rect)
@@ -144,7 +145,6 @@ class Display:
 				self.pump()
 
 				self.update(image_rect)
-				self.wait(300)
 
 		self.pump()
 
@@ -387,7 +387,6 @@ class Display:
 
 		user_clicked = False
 		while user_clicked == False:
-			self.prompt_event()
 			for event in self.get_events():
 				if event.type == pygame.QUIT:
 					self.quit()
@@ -418,7 +417,7 @@ class Display:
 						return selected_suit
 
 					if self.button_rect_actual.collidepoint(pos):
-						self.update_announcement(f'You passed')
+						self.update_announcement('You passed')
 						return ''
 
 	def select_card(self,user,played_so_far):
@@ -427,9 +426,8 @@ class Display:
 
 		user_clicked = False
 		while user_clicked == False:
-			self.prompt_event()
 			for event in self.get_events():
-				print(event)
+
 				if event.type == pygame.QUIT:
 					self.quit()
 				elif event.type == pygame.MOUSEBUTTONUP:
@@ -441,7 +439,9 @@ class Display:
 						card_index = [card_rect.collidepoint(pos) for card_rect in user.get_hand().get_rects()].index(True)
 						selected_card = [card for card in user.get_hand().get_cards()][card_index]
 
-						#If the user if following 
+						print(selected_card.get_suit())
+
+						#If the user is following 
 						if len(played_so_far) != 0:
 
 							#If trump was led and the user has the left, but didn't play it 
@@ -458,6 +458,7 @@ class Display:
 
 							else:
 								user.get_hand().remove_card(selected_card)
+								user.get_hand().remove_rect(card_index)
 								return selected_card
 
 

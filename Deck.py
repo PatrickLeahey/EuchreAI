@@ -41,7 +41,10 @@ class Deck:
 		self.cards.append(Card('C','K','5','config/card_imgs/KC.png'))
 		self.cards.append(Card('C','A','6','config/card_imgs/AC.png'))
 
+		random.shuffle(self.cards)
+
 	def get_cards(self):
+		random.seed(datetime.datetime.now().strftime('%S'))
 		return self.cards
 
 	def draw_card(self):

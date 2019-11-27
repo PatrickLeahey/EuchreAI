@@ -16,6 +16,14 @@ class Hand:
 	def get_rects(self):
 		return self.rects
 
+	def remove_rect(self,index):
+		print(self.rects)
+		for rect,i in zip(self.rects,range(len(self.rects))):
+			if i > index:
+				self.rects[i-1] = rect
+		self.rects.pop(-1)
+		print(self.rects)
+		
 	def remove_card(self,card):
 		self.cards.remove(card)
 
