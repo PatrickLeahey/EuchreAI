@@ -8,9 +8,3 @@ import random
 #Wait for button to be clicked before starting game
 game = Game()
 game.create_user()
-
-
-
-
-
-
